@@ -1,0 +1,20 @@
+{
+  "name": "حديث اليوم — الأحاديث القصار",
+  "short_name": "حديث اليوم",
+  "description": "حديث نبوي كل يوم من مائتي حديث من الصحيحين، مع البحث والمفضلة والتذكير اليومي.",
+  "lang": "ar",
+  "dir": "rtl",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f0e2",
+  "theme_color": "#18423c",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
