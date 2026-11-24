@@ -1,3 +1,5 @@
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
 /* Imported into the generated service worker: daily reminder + notification clicks. */
 const REMINDER_CACHE = "hadith-reminder";
 const REMINDER_URL = "/__hadith-reminder.json";
