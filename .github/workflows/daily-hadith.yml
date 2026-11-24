@@ -1,0 +1,51 @@
+name: Daily Hadith Push Notification
+
+on:
+  schedule:
+    # يعمل يومياً الساعة 5:00 فجراً بتوقيت مكة المكرمة (02:00 UTC)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # يتيح لكِ تشغيل الإشعار يدوياً في أي لحظة للتجربة
+
+jobs:
+  send-hadith:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Send Daily Hadith via OneSignal
+        env:
+          ONESIGNAL_APP_ID: 1b1cdaa3-a27d-4294-ba06-382d85955d9c
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const content = fs.readFileSync("src/data/hadiths.ts", "utf8");
+            const texts = [...content.matchAll(/"text":\s*"([^"]+)"/g)].map(m => m[1]);
+            const sources = [...content.matchAll(/"source":\s*"([^"]+)"/g)].map(m => m[1]);
+
+            const dayIndex = Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % (texts.length || 1);
+            const rawText = texts[dayIndex] || "حديث اليوم النبوي الشريف متاح الآن في تطبيق زاد";
+            const source = sources[dayIndex] ? ` (${sources[dayIndex]})` : "";
+            const bodyText = rawText.length > 170 ? rawText.slice(0, 167) + "..." + source : rawText + source;
+
+            fetch("https://api.onesignal.com/notifications", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json; charset=utf-8",
+                "Authorization": `Key ${process.env.ONESIGNAL_REST_API_KEY}`
+              },
+              body: JSON.stringify({
+                app_id: process.env.ONESIGNAL_APP_ID,
+                included_segments: ["Subscribed Users"],
+                headings: { ar: "🌿 حديث اليوم | زاد", en: "🌿 حديث اليوم | زاد" },
+                contents: { ar: bodyText, en: bodyText },
+                url: "https://zad-hadith-1.shahd-okrom.workers.dev"
+              })
+            }).then(res => res.json()).then(data => console.log("OneSignal Response:", data));
+          '
