@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -78,9 +79,6 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    // Replace these placeholders with the app's name and description when first building the app.
-    // Each content route, / included, must still set its own head(). Never add og:image or
-    // twitter:image here: every page without its own would inherit the root's preview image.
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -112,6 +110,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        src: "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js",
+        defer: true,
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -138,11 +142,22 @@ function RootComponent() {
 
   useEffect(() => {
     void registerAppServiceWorker();
+
+    if (typeof window !== "undefined") {
+      const w = window as unknown as { OneSignalDeferred?: Array<(os: any) => void> };
+      w.OneSignalDeferred = w.OneSignalDeferred || [];
+      w.OneSignalDeferred.push(async function (OneSignal: any) {
+        await OneSignal.init({
+          appId: "1b1cdaa3-a27d-4294-ba06-382d85955d9c",
+          serviceWorkerParam: { scope: "/" },
+          serviceWorkerPath: "sw.js",
+        });
+      });
+    }
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" dir="rtl" richColors />
     </QueryClientProvider>
