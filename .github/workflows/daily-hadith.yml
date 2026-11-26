@@ -45,7 +45,7 @@ jobs:
                 included_segments: ["Subscribed Users"],
                 headings: { ar: "🌿 حديث اليوم | زاد", en: "🌿 حديث اليوم | زاد" },
                 contents: { ar: bodyText, en: bodyText },
-                url: "https://zad-hadith-1.shahd-okrom.workers.dev"
+                url: "https://zad-hadith-1.zad-app.workers.dev"
               })
             }).then(res => res.json()).then(data => console.log("OneSignal Response:", data));
           '
